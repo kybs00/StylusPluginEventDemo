@@ -32,14 +32,34 @@ namespace StylusPluginEventDemo
             _uiThreadId = uiThreadId;
         }
 
+        protected override void OnStylusDown(RawStylusInput rawStylusInput)
+        {
+            if (Thread.CurrentThread.ManagedThreadId == _uiThreadId)
+            {
+                return;
+            }
+            Console.WriteLine($"{DateTime.Now.ToString("HH:mm:ss.fff")}:StylusPluginOnStylusDown {rawStylusInput.GetStylusPoints().Count}个点");
+            base.OnStylusDown(rawStylusInput);
+        }
+
         protected override void OnStylusMove(RawStylusInput rawStylusInput)
         {
             if (Thread.CurrentThread.ManagedThreadId == _uiThreadId)
             {
                 return;
             }
-            Console.WriteLine($"{DateTime.Now.ToString("HH:mm:ss.fff")}:StylusPluginOnStylusMove{rawStylusInput.GetStylusPoints().Count}个点");
+            Console.WriteLine($"{DateTime.Now.ToString("HH:mm:ss.fff")}:StylusPluginOnStylusMove {rawStylusInput.GetStylusPoints().Count}个点");
             base.OnStylusMove(rawStylusInput);
+        }
+
+        protected override void OnStylusUp(RawStylusInput rawStylusInput)
+        {
+            if (Thread.CurrentThread.ManagedThreadId == _uiThreadId)
+            {
+                return;
+            }
+            Console.WriteLine($"{DateTime.Now.ToString("HH:mm:ss.fff")}:StylusPluginOnStylusUp {rawStylusInput.GetStylusPoints().Count}个点");
+            base.OnStylusUp(rawStylusInput);
         }
     }
 }
