@@ -32,13 +32,17 @@ namespace StylusPluginEventDemo
             _uiThreadId = uiThreadId;
         }
 
+        private int _count = 0;
+        private int _lastTick;
         protected override void OnStylusDown(RawStylusInput rawStylusInput)
         {
             if (Thread.CurrentThread.ManagedThreadId == _uiThreadId)
             {
                 return;
             }
-            Console.WriteLine($"{DateTime.Now.ToString("HH:mm:ss.fff")}:StylusPluginOnStylusDown {rawStylusInput.GetStylusPoints().Count}个点");
+
+            _count = 0;
+            _lastTick = Environment.TickCount;
             base.OnStylusDown(rawStylusInput);
         }
 
@@ -48,7 +52,12 @@ namespace StylusPluginEventDemo
             {
                 return;
             }
-            Console.WriteLine($"{DateTime.Now.ToString("HH:mm:ss.fff")}:StylusPluginOnStylusMove {rawStylusInput.GetStylusPoints().Count}个点");
+
+            lock (this)
+            {
+                _count++;
+            }
+            Console.WriteLine($"{DateTime.Now.ToString("HH:mm:ss.fff")}:StylusPluginOnStylusMove");
             base.OnStylusMove(rawStylusInput);
         }
 
@@ -58,7 +67,9 @@ namespace StylusPluginEventDemo
             {
                 return;
             }
-            Console.WriteLine($"{DateTime.Now.ToString("HH:mm:ss.fff")}:StylusPluginOnStylusUp {rawStylusInput.GetStylusPoints().Count}个点");
+
+            var averageTime = (Environment.TickCount - _lastTick) / _count;
+            Console.WriteLine($"{DateTime.Now.ToString("HH:mm:ss.fff")}:报点率 {1000 / averageTime}fps,平均{(Environment.TickCount - _lastTick) / _count}ms");
             base.OnStylusUp(rawStylusInput);
         }
     }
